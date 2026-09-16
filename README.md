@@ -5,7 +5,7 @@ Application de piano MIDI open source inspirée du principe de Synthesia.
 ## Prérequis
 
 - Python 3.12 ou plus
-- Windows 10/11.............................................................................................................................................................................................................
+- Windows 10/11
 - Un clavier MIDI physique comme le Yamaha P-45
 
 ## Installation
