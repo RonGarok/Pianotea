@@ -1,0 +1,1 @@
+"""Software audio playback for MIDI notes."""

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Local verification artifacts
+verify.txt
+
+# SoundFont files can be large and may have separate licenses
+assets/*.sf2
+soundfonts/*.sf2
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
