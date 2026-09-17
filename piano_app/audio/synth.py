@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import math
+import logging
 import threading
 
 import numpy as np
 from PySide6 import QtCore, QtMultimedia
+
+
+logger = logging.getLogger(__name__)
 
 
 class _AudioStream(QtCore.QIODevice):
@@ -45,10 +49,24 @@ class SoftwareSynth(QtCore.QObject):
         audio_format.setSampleRate(self.SAMPLE_RATE)
         audio_format.setChannelCount(1)
         audio_format.setSampleFormat(QtMultimedia.QAudioFormat.SampleFormat.Int16)
-        self._sink = QtMultimedia.QAudioSink(audio_format, self)
-        self._sink.setBufferSize(8192)
-        self._sink.setVolume(0.55)
-        self._sink.start(self._stream)
+        self._sink = None
+        audio_device = QtMultimedia.QMediaDevices.defaultAudioOutput()
+        if audio_device.isNull():
+            logger.warning("No audio output device is available; software audio is disabled")
+            self._stream.close()
+            return
+
+        sink = QtMultimedia.QAudioSink(audio_device, audio_format, self)
+        sink.setBufferSize(8192)
+        sink.setVolume(0.55)
+        sink.start(self._stream)
+        if sink.error().value != QtMultimedia.QAudio.Error.NoError.value:
+            logger.warning("Unable to start software audio: %s", sink.error())
+            sink.stop()
+            self._stream.close()
+            sink.deleteLater()
+            return
+        self._sink = sink
 
     def handle_message(self, message):
         if message.type == "program_change":
@@ -168,5 +186,6 @@ class SoftwareSynth(QtCore.QObject):
             return
         self._closed = True
         self.stop_all()
-        self._sink.stop()
+        if self._sink is not None:
+            self._sink.stop()
         self._stream.close()
